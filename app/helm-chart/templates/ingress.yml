@@ -1,0 +1,30 @@
+{{- if .Values.ingress.enabled }}  # Conditionally render if ingress is enabled
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ .Release.Name }}-python-app  # Unique name based on Helm release
+  labels:
+    app: {{ .Release.Name }}-python-app  # Label for app identification
+    chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}  # Helm chart metadata
+    release: {{ .Release.Name }}  # Helm release label
+  {{- with .Values.ingress.annotations }}  # Optional annotations for ALB
+  annotations:
+    {{- toYaml . | nindent 4 }}  # Correct indentation with nindent
+  {{- end }}
+spec:
+  rules:
+    {{- range .Values.ingress.hosts }}  # Loop over each host in values.yaml
+    - host: {{ .host | quote }}  # Ensure host is a valid string
+      http:
+        paths:
+          {{- range .paths }}  # Loop over paths for each host
+          - path: {{ .path | quote }}  # Define the URL path
+            pathType: {{ .pathType | default "Prefix" | quote }}  # Default path type
+            backend:
+              service:
+                name: {{ $.Release.Name }}-python-app  # Use root context for .Release.Name
+                port:
+                  number: {{ $.Values.service.port | default 80 }}  # Default to port 80
+          {{- end }}
+    {{- end }}
+{{- end }}

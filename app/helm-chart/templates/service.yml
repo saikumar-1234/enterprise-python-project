@@ -1,0 +1,18 @@
+# yaml-language-server: $schema=https://kubernetesjsonschema.dev/v1.18.0/service-v1.json
+# app/helm-chart/templates/service.yaml - Kubernetes service manifest
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Release.Name }}-python-app
+  labels:
+    app: {{ .Release.Name }}-python-app
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - port: {{ .Values.service.port }}
+      targetPort: 8080
+      protocol: TCP
+      name: http
+  selector:
+    app: {{ .Release.Name }}-python-app

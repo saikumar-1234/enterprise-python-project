@@ -1,0 +1,42 @@
+# Enterprise EKS Project
+
+This project provides a production-ready setup for deploying a Python Flask application on Amazon EKS using Terraform, Jenkins, SonarQube, Docker, Trivy, Helm, and Argo CD.
+
+## Structure
+- `terraform/`: Terraform code for EKS cluster, VPC, and IAM roles.
+- `app/`: Python application, Dockerfile, Helm chart, and Argo CD configuration.
+
+## Prerequisites
+- AWS account with IAM permissions for EKS, VPC, ECR, and S3.
+- Terraform CLI installed.
+- Jenkins with plugins for Docker, SonarQube, and AWS CLI.
+- SonarQube instance for code quality analysis.
+- Trivy installed for image scanning.
+- Argo CD installed on EKS.
+- Git repository for code storage.
+
+## Setup Instructions
+1. **Terraform Deployment**:
+   - Update `terraform/providers.tf` with your S3 bucket and DynamoDB table.
+   - Configure AWS credentials in Jenkins.
+   - Run the `terraform/Jenkinsfile` pipeline to deploy the EKS cluster.
+
+2. **Application Deployment**:
+   - Create an ECR repository for `python-app`.
+   - Update `<your-git-repo>` and `<your-account-id>` in `app/Jenkinsfile` and `app/helm-chart/values.yaml`.
+   - Deploy SonarQube and Argo CD on EKS.
+   - Run the `app/Jenkinsfile` pipeline to build, scan, and deploy the application.
+
+3. **Verification**:
+   - Check the EKS cluster in AWS Console.
+   - Access the application via the ALB URL (e.g., `python-app.example.com`).
+   - Monitor deployments in Argo CD UI.
+
+## Production Considerations
+- Use IRSA for EKS pod permissions.
+- Enable encryption for EKS and EBS volumes.
+- Configure monitoring with Prometheus and CloudWatch.
+- Set up backups with Velero.
+
+## License
+MIT License

@@ -1,0 +1,36 @@
+
+# app/helm-chart/templates/deployment.yaml - Kubernetes Deployment manifest
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: "{{ .Release.Name | default 'default-release' }}-python-app"
+  labels:
+    app: "{{ .Release.Name }}-python-app"
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace '+' '_' }}"
+    release: "{{ .Release.Name }}"
+spec:
+  replicas: {{ .Values.replicaCount | default 2 | int }}
+  selector:
+    matchLabels:
+      app: "{{ .Release.Name }}-python-app"
+  template:
+    metadata:
+      labels:
+        app: {{ .Release.Name }}-python-app
+        version: {{ .Values.image.tag | default "latest" | quote }}
+    spec:
+      containers:
+        - name: python-app
+          image: "{{ .Values.image.repository | required 'image.repository is required' }}:{{ .Values.image.tag | default 'latest' | quote }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy | default "IfNotPresent" | quote }}
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+              name: http
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          livenessProbe:
+            {{- toYaml .Values.livenessProbe | nindent 12 }}
+          readinessProbe:
+            {{- toYaml .Values.readinessProbe | nindent 12 }}
